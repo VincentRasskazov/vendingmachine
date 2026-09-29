@@ -3,416 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GachaVend | Passive Income Vending Solutions</title>
-    
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Vending Partner Portal</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Chart.js for live graphs -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#f0fdfa',
-                            100: '#ccfbf1',
-                            500: '#14b8a6',
-                            600: '#0d9488',
-                            900: '#134e4a',
-                            accent: '#3b82f6' // Blue accent
-                        }
-                    },
-                    boxShadow: {
-                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                        'glow': '0 0 20px rgba(20, 184, 166, 0.3)',
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; scroll-behavior: smooth; }
-        .hidden-view { display: none !important; }
-        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .slide-up { animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* Toast Notifications */
-        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { padding: 12px 20px; border-radius: 8px; color: white; font-size: 14px; font-weight: 500; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); animation: slideUp 0.3s ease-out; }
-        .toast.success { background-color: #10b981; }
-        .toast.error { background-color: #ef4444; }
-        .toast.info { background-color: #3b82f6; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .hidden-view {
+            display: none !important;
+        }
+        /* Custom Toast Animation */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-enter {
+            animation: slideIn 0.3s ease-out forwards;
+        }
     </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
-    <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
+    <nav class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <!-- Logo -->
-                <div class="flex items-center cursor-pointer group" onclick="app.showView('landing')">
-                    <div class="w-10 h-10 bg-gradient-to-br from-brand-500 to-brand-accent rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-500/20 group-hover:shadow-brand-500/40 transition-all mr-3">
-                        <i class="fa-solid fa-box-open text-xl"></i>
-                    </div>
-                    <span class="font-bold text-2xl tracking-tight text-slate-900">Gacha<span class="text-brand-600">Vend</span></span>
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <!-- Generic Vending Icon -->
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                    <span class="font-bold text-xl tracking-tight">Partner Portal</span>
                 </div>
-                
-                <!-- Nav Actions -->
-                <div class="flex items-center space-x-4">
-                    <div id="nav-user-info" class="hidden text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full"></div>
-                    <button id="nav-dashboard-btn" onclick="app.routeDashboard()" class="hidden text-brand-600 font-semibold hover:text-brand-700 transition-colors mr-2">
-                        Dashboard
-                    </button>
-                    <button id="nav-login-btn" onclick="app.showView('login')" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-lg text-sm font-semibold shadow-soft transition-all transform hover:-translate-y-0.5">
-                        Partner Login
-                    </button>
-                    <button id="nav-logout-btn" onclick="app.logout()" class="hidden bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all">
-                        Logout
-                    </button>
+                <div>
+                    <button id="navLoginBtn" class="text-slate-600 hover:text-blue-600 font-medium px-4 py-2 transition-colors">Partner Login</button>
+                    <div id="navUserMenu" class="hidden-view flex items-center gap-4">
+                        <span id="navUserEmail" class="text-sm text-slate-500 font-medium hidden sm:block"></span>
+                        <button id="navLogoutBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">Sign Out</button>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="flex-grow w-full relative">
-        <div id="view-landing" class="fade-in block">
-            <!-- Hero Section -->
-            <div class="relative overflow-hidden bg-white">
-                <div class="absolute inset-0 z-0">
-                    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brand-50 via-white to-white"></div>
-                </div>
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 lg:pt-32 lg:pb-40 relative z-10 text-center">
-                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 mb-8 slide-up" style="animation-delay: 0.1s;">
-                        Turn Idle Floor Space Into <br class="hidden md:block">
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-brand-accent">Passive Revenue.</span>
-                    </h1>
-                    <p class="mt-4 text-xl text-slate-600 max-w-3xl mx-auto mb-10 slide-up leading-relaxed" style="animation-delay: 0.2s;">
-                        We place premium Japanese Gachapon machines in your venue at <strong>zero cost</strong>. We handle the hardware, trend-focused stock, and maintenance. You simply collect your cut of every sale.
-                    </p>
-                    <div class="flex flex-col sm:flex-row justify-center gap-4 slide-up" style="animation-delay: 0.3s;">
-                        <button onclick="document.getElementById('contact-section').scrollIntoView()" class="bg-brand-600 hover:bg-brand-500 text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg shadow-brand-500/30 transition-all transform hover:-translate-y-1">
-                            Request a Machine
-                        </button>
-                        <button onclick="document.getElementById('features-section').scrollIntoView()" class="bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 px-8 py-4 rounded-xl text-lg font-bold transition-all">
-                            How it Works
-                        </button>
-                    </div>
-                </div>
-            </div>
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-            <div id="features-section" class="py-24 bg-slate-50 border-t border-slate-100">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="text-center mb-16">
-                        <h2 class="text-3xl font-bold text-slate-900">Zero Risk. Zero Effort.</h2>
-                        <p class="text-slate-500 mt-4 text-lg">A truly hands-off income stream for modern businesses.</p>
+    <main class="flex-grow flex flex-col">
+        <section id="view-public" class="flex-grow flex flex-col">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex-grow flex items-center">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-6">
+                            Elevate your venue with automated revenue.
+                        </h1>
+                        <p class="text-lg text-slate-600 mb-8">
+                            Partner with us to host premium automated retail machines. Zero upfront cost, zero maintenance. You provide the floor space, we provide a steady stream of passive income.
+                        </p>
+                        <div class="flex gap-4">
+                            <button id="ctaLoginBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium shadow-sm transition-colors">
+                                Access Partner Portal
+                            </button>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-                        <!-- Feature 1 -->
-                        <div class="bg-white p-8 rounded-2xl shadow-soft hover:shadow-lg transition-shadow border border-slate-100">
-                            <div class="w-14 h-14 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center text-2xl mb-6">
-                                <i class="fa-solid fa-seedling"></i>
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900 mb-3">$0 Capital Required</h3>
-                            <p class="text-slate-600 leading-relaxed">The machine, the highly-demanded capsule toys, and the IoT hardware are completely free. No hidden fees or lock-in contracts.</p>
-                        </div>
-                        <!-- Feature 2 -->
-                        <div class="bg-white p-8 rounded-2xl shadow-soft hover:shadow-lg transition-shadow border border-slate-100">
-                            <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-2xl mb-6">
-                                <i class="fa-solid fa-satellite-dish"></i>
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900 mb-3">Live IoT Tracking</h3>
-                            <p class="text-slate-600 leading-relaxed">Our machines sync directly to the cloud. Log into your partner dashboard to watch live sales occur in real-time and track your payouts.</p>
-                        </div>
-                        <!-- Feature 3 -->
-                        <div class="bg-white p-8 rounded-2xl shadow-soft hover:shadow-lg transition-shadow border border-slate-100">
-                            <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-2xl mb-6">
-                                <i class="fa-solid fa-truck-fast"></i>
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900 mb-3">Automated Restocking</h3>
-                            <p class="text-slate-600 leading-relaxed">We monitor stock levels remotely via our smart trackers. Before a machine runs empty, our team arrives to service and refill it automatically.</p>
+                    <div class="hidden md:block">
+                        <div class="bg-slate-100 rounded-3xl p-8 shadow-inner border border-slate-200 relative aspect-square flex items-center justify-center overflow-hidden">
+                            <!-- Abstract Representation of Data/Vending -->
+                            <div class="absolute inset-0 bg-gradient-to-tr from-blue-100 to-slate-50 opacity-50"></div>
+                            <svg class="w-48 h-48 text-blue-500 relative z-10 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Contact Section -->
-            <div id="contact-section" class="py-24 bg-slate-900 text-white relative overflow-hidden">
-                <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmZmZmYiLz48L3N2Zz4=')]"></div>
-                <div class="max-w-3xl mx-auto px-4 text-center relative z-10">
-                    <h2 class="text-4xl font-extrabold mb-6">Ready to monetize your space?</h2>
-                    <p class="text-slate-300 mb-10 text-lg">Contact us to see if your location qualifies for a GachaVend placement.</p>
-                    <a href="mailto:vincent.rasskazov@gmail.com" class="inline-flex items-center justify-center bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-xl text-lg font-bold transition-colors">
-                        <i class="fa-solid fa-envelope mr-3 text-brand-600"></i> Email Sales Team
-                    </a>
-                    <p class="mt-8 text-sm text-slate-500">ABN: 53 375 397 074 • Sydney, Australia</p>
-                </div>
-            </div>
-        </div>
+        </section>
 
-        <div id="view-login" class="hidden-view fade-in min-h-[calc(100vh-64px)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            <!-- Background Decoration -->
-            <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-brand-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
-            <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
-
-            <div class="max-w-md w-full space-y-8 bg-white/60 backdrop-blur-xl p-10 rounded-3xl shadow-xl border border-white relative z-10">
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl flex items-center justify-center text-white mx-auto mb-4 shadow-lg">
-                        <i class="fa-solid fa-lock text-2xl"></i>
-                    </div>
-                    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Partner Portal</h2>
-                    <p class="mt-2 text-sm text-slate-500">Sign in to access your live machine metrics</p>
-                </div>
-                <form id="login-form" class="mt-8 space-y-6" onsubmit="app.handleLogin(event)">
-                    <div class="space-y-4">
+        <section id="view-login" class="hidden-view fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden relative">
+                <button id="closeLoginBtn" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <div class="p-8">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-2">Partner Login</h2>
+                    <p class="text-slate-500 text-sm mb-6">Enter your credentials to access your dashboard.</p>
+                    
+                    <form id="loginForm" class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
-                            <input id="login-email" type="email" required class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-slate-300 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent sm:text-sm transition-all" placeholder="venue@example.com">
+                            <input type="email" id="loginEmail" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="partner@venue.com">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                            <input id="login-password" type="password" required class="appearance-none rounded-xl relative block w-full px-4 py-3 border border-slate-300 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent sm:text-sm transition-all" placeholder="••••••••">
+                            <input type="password" id="loginPassword" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="••••••••">
                         </div>
-                    </div>
-                    <div>
-                        <button type="submit" id="login-submit-btn" class="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all shadow-md hover:shadow-lg">
-                            Secure Sign In <i class="fa-solid fa-arrow-right ml-2 mt-0.5 opacity-70 group-hover:translate-x-1 transition-transform"></i>
+                        <div id="loginError" class="hidden-view text-red-500 text-sm font-medium bg-red-50 p-3 rounded-lg"></div>
+                        <button type="submit" id="loginSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition-colors flex justify-center items-center">
+                            <span>Sign In</span>
                         </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div id="view-admin" class="hidden-view fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-                <div>
-                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Admin Command Center</h1>
-                    <p class="text-slate-500 mt-1 font-medium">Network overview & revenue tracking.</p>
+                    </form>
                 </div>
-                <button onclick="app.simulateSaleAdmin()" class="bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-sm flex items-center">
-                    <i class="fa-solid fa-microchip mr-2"></i> Trigger IoT Sale (Test)
+            </div>
+        </section>
+
+        <section id="view-admin" class="hidden-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-900">Operator Overview</h1>
+                    <p class="text-slate-500 mt-1">Live network performance and metrics.</p>
+                </div>
+                <!-- Testing Button: Only visible to admin to simulate hardware sales -->
+                <button id="adminTestSaleBtn" class="text-sm bg-indigo-50 text-indigo-600 hover:bg-indigo-100 px-3 py-1.5 rounded-md font-medium border border-indigo-200 transition-colors">
+                    + Simulate $2.00 Sale
                 </button>
             </div>
 
-            <!-- Admin KPIs -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl text-brand-600"><i class="fa-solid fa-boxes-stacked"></i></div>
-                    <div class="text-sm font-semibold text-slate-500 mb-1 uppercase tracking-wider">Network Volume</div>
-                    <div class="text-4xl font-extrabold text-slate-900" id="admin-total-sales">0</div>
-                    <div class="text-xs font-medium text-slate-400 mt-2">Total capsules dispensed</div>
-                </div>
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl text-emerald-600"><i class="fa-solid fa-sack-dollar"></i></div>
-                    <div class="text-sm font-semibold text-slate-500 mb-1 uppercase tracking-wider">Gross Revenue</div>
-                    <div class="text-4xl font-extrabold text-slate-900" id="admin-gross-revenue">$0.00</div>
-                    <div class="text-xs font-medium text-emerald-500 mt-2"><i class="fa-solid fa-arrow-trend-up mr-1"></i> Live updating</div>
-                </div>
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl text-orange-600"><i class="fa-solid fa-handshake"></i></div>
-                    <div class="text-sm font-semibold text-slate-500 mb-1 uppercase tracking-wider">Venue Liabilities</div>
-                    <div class="text-4xl font-extrabold text-orange-500" id="admin-venue-payouts">$0.00</div>
-                    <div class="text-xs font-medium text-slate-400 mt-2">Total unpaid partner cuts</div>
-                </div>
-                <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl"><i class="fa-solid fa-vault"></i></div>
-                    <div class="text-sm font-semibold text-slate-300 mb-1 uppercase tracking-wider">Estimated Net Profit</div>
-                    <div class="text-4xl font-extrabold text-brand-400" id="admin-net-profit">$0.00</div>
-                    <div class="text-xs font-medium text-slate-400 mt-2">Gross - (Cogs + Venue Cuts)</div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Chart -->
-                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-bold text-slate-900">7-Day Network Performance</h3>
-                        <span class="bg-brand-50 text-brand-700 text-xs font-bold px-2.5 py-1 rounded-md">Live</span>
-                    </div>
-                    <div class="relative h-80 w-full">
-                        <canvas id="adminSalesChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col h-full">
-                    <h3 class="text-lg font-bold text-slate-900 mb-4">Venue Management</h3>
-                    
-                    <!-- Create Venue Form -->
-                    <form id="admin-create-venue-form" onsubmit="app.handleCreateVenue(event)" class="space-y-4 mb-8 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                        <h4 class="text-sm font-bold text-slate-700 mb-3"><i class="fa-solid fa-plus-circle mr-1"></i> Register New Venue</h4>
-                        <div>
-                            <input type="text" id="cv-name" required placeholder="Venue Name (e.g. Local Cafe)" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none">
-                        </div>
-                        <div>
-                            <input type="email" id="cv-email" required placeholder="Login Email" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none">
-                        </div>
-                        <div>
-                            <input type="password" id="cv-password" required placeholder="Temporary Password" minlength="6" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="text-xs font-semibold text-slate-600 ml-1 block mb-1">Commission Cut (%)</label>
-                            <input type="number" id="cv-cut" required min="0" max="100" value="20" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none">
-                        </div>
-                        <button type="submit" id="cv-submit-btn" class="w-full bg-slate-900 text-white py-2.5 rounded-lg text-sm font-bold hover:bg-slate-800 transition-colors flex justify-center items-center">
-                            Create Partner Account
-                        </button>
-                    </form>
-
-                    <!-- Venue List -->
-                    <div class="flex-grow flex flex-col">
-                        <h4 class="text-sm font-bold text-slate-700 mb-3 border-b border-slate-100 pb-2">Active Venues</h4>
-                        <div id="admin-venue-list" class="space-y-3 overflow-y-auto pr-2 max-h-64 custom-scrollbar">
-                            <!-- Populated by JS -->
-                            <div class="flex justify-center items-center h-20 text-sm text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading...</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-venue" class="hidden-view fade-in max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-             <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4 border-b border-slate-200 pb-6">
-                <div>
-                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight" id="venue-welcome-text">Partner Dashboard</h1>
-                    <p class="text-slate-500 mt-1 font-medium">Live monitoring for your machine.</p>
-                </div>
-                <div class="bg-emerald-50 text-emerald-700 px-4 py-2.5 rounded-lg border border-emerald-100 font-bold text-sm flex items-center shadow-sm">
-                    <span class="relative flex h-3 w-3 mr-3">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                    </span>
-                    IoT Tracker Online
-                </div>
-            </div>
-
-            <!-- Venue KPIs -->
+            <!-- KPI Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex items-center">
-                    <div class="w-16 h-16 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center text-3xl mr-5">
-                        <i class="fa-solid fa-box-open"></i>
-                    </div>
-                    <div>
-                        <div class="text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Total Sales</div>
-                        <div class="text-3xl font-extrabold text-slate-900" id="venue-total-sales">0</div>
-                    </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <p class="text-sm font-medium text-slate-500 mb-1">Total Network Revenue</p>
+                    <h3 class="text-3xl font-bold text-slate-900" id="adminTotalRev">$0.00</h3>
                 </div>
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex items-center">
-                    <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center text-3xl mr-5">
-                        <i class="fa-solid fa-coins"></i>
-                    </div>
-                    <div>
-                        <div class="text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Gross Machine Rev</div>
-                        <div class="text-3xl font-extrabold text-slate-900" id="venue-gross-revenue">$0.00</div>
-                    </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <p class="text-sm font-medium text-slate-500 mb-1">Total Venue Payouts Owed</p>
+                    <h3 class="text-3xl font-bold text-blue-600" id="adminTotalPayouts">$0.00</h3>
                 </div>
-                <div class="bg-gradient-to-br from-brand-500 to-brand-600 rounded-2xl shadow-md p-6 text-white flex items-center relative overflow-hidden">
-                    <div class="absolute right-[-10%] top-[-10%] opacity-20 text-8xl"><i class="fa-solid fa-wallet"></i></div>
-                    <div class="relative z-10">
-                        <div class="text-xs font-bold text-brand-100 mb-1 uppercase tracking-wider">Your Cut (<span id="venue-cut-percent">0</span>%)</div>
-                        <div class="text-4xl font-extrabold" id="venue-net-cut">$0.00</div>
-                        <div class="text-xs font-medium text-brand-200 mt-1">Pending payout balance</div>
-                    </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 relative overflow-hidden">
+                    <div class="absolute right-0 top-0 h-full w-2 bg-green-500"></div>
+                    <p class="text-sm font-medium text-slate-500 mb-1">Estimated Net Profit (Post-Costs)</p>
+                    <h3 class="text-3xl font-bold text-green-600" id="adminNetProfit">$0.00</h3>
+                    <p class="text-xs text-slate-400 mt-2">*Assumes 30% COGS + Venue Cuts</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Activity Feed -->
-                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-0 overflow-hidden flex flex-col">
-                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                        <h3 class="text-lg font-bold text-slate-900">Recent Machine Activity</h3>
-                        <button onclick="app.simulateSaleVenue()" class="text-xs bg-white border border-slate-200 hover:bg-slate-50 px-3 py-1.5 rounded-md font-semibold text-slate-600 transition-colors">
-                            Test Sale <i class="fa-solid fa-vial ml-1"></i>
-                        </button>
-                    </div>
-                    <div class="overflow-x-auto flex-grow">
-                        <table class="min-w-full divide-y divide-slate-100">
-                            <thead>
-                                <tr class="bg-white">
-                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Date & Time</th>
-                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Event Type</th>
-                                    <th class="px-6 py-4 text-right text-xs font-bold text-slate-400 uppercase tracking-wider">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody id="venue-activity-log" class="bg-white divide-y divide-slate-50">
-                                <!-- Populated by JS -->
-                            </tbody>
-                        </table>
-                        <div id="venue-empty-state" class="text-center py-16 text-slate-400 hidden flex-col items-center">
-                            <i class="fa-solid fa-chart-bar text-4xl mb-3 opacity-50"></i>
-                            <p class="font-medium">No sales recorded yet.</p>
-                            <p class="text-sm">Waiting for hardware tracker signal.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Venue Account Settings -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                    <h3 class="text-lg font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">Account & Security</h3>
-                    
-                    <form onsubmit="app.handleUpdateVenueEmail(event)" class="space-y-4 mb-6">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">Login Email</label>
-                            <div class="flex">
-                                <input type="email" id="vs-email" required class="flex-grow px-3 py-2.5 border border-slate-300 rounded-l-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none">
-                                <button type="submit" class="bg-slate-100 border border-l-0 border-slate-300 text-slate-700 px-4 rounded-r-lg text-sm font-bold hover:bg-slate-200 transition-colors">Update</button>
-                            </div>
-                        </div>
-                    </form>
-
-                    <form onsubmit="app.handleUpdateVenuePassword(event)" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-600 mb-1 uppercase tracking-wider">Change Password</label>
-                            <input type="password" id="vs-password" required minlength="6" placeholder="New Password" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none mb-2">
-                            <button type="submit" class="w-full bg-slate-900 text-white py-2.5 rounded-lg text-sm font-bold hover:bg-slate-800 transition-colors">Save New Password</button>
-                        </div>
-                    </form>
-                    
-                    <div class="mt-8 pt-6 border-t border-slate-100">
-                        <button onclick="app.showToast('Generating PDF statement... (Demo)', 'info')" class="w-full flex justify-center items-center text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 py-3 rounded-xl text-sm font-bold transition-all">
-                            <i class="fa-solid fa-file-invoice mr-2"></i> Download Payout Report
-                        </button>
-                    </div>
+            <!-- Chart -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
+                <h3 class="font-bold text-slate-800 mb-4">Network Sales Trend (30 Days)</h3>
+                <div class="h-72 w-full">
+                    <canvas id="adminSalesChart"></canvas>
                 </div>
             </div>
-        </div>
+
+            <!-- Venue Management -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="font-bold text-slate-800 mb-4">Partner Venues</h3>
+                
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-sm text-slate-500">
+                                <th class="pb-3 font-medium">Venue Name</th>
+                                <th class="pb-3 font-medium">Email</th>
+                                <th class="pb-3 font-medium">Commission Cut</th>
+                                <th class="pb-3 font-medium text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminVenuesTableBody" class="text-sm text-slate-700">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                    <h4 class="font-medium text-slate-800 mb-3 text-sm">Register New Venue Profile</h4>
+                    <p class="text-xs text-slate-500 mb-4">Create the data profile here. Ensure you create their actual login password in the Firebase Authentication Console.</p>
+                    <form id="addVenueForm" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                        <div class="md:col-span-1">
+                            <label class="block text-xs font-medium text-slate-700 mb-1">Venue Name</label>
+                            <input type="text" id="newVenueName" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-xs font-medium text-slate-700 mb-1">Email Address</label>
+                            <input type="email" id="newVenueEmail" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div class="md:col-span-1">
+                            <label class="block text-xs font-medium text-slate-700 mb-1">Cut Percentage (%)</label>
+                            <input type="number" id="newVenueCut" min="0" max="100" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        </div>
+                        <div class="md:col-span-1">
+                            <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 rounded-lg text-sm transition-colors">
+                                Add Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-venue" class="hidden-view max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+            <div class="mb-8 border-b border-slate-200 pb-6">
+                <h1 class="text-3xl font-bold text-slate-900" id="venueWelcome">Welcome, Partner</h1>
+                <p class="text-slate-500 mt-1">View your machine's live performance and earnings.</p>
+            </div>
+
+            <!-- Venue KPI Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <p class="text-sm font-medium text-slate-500 mb-1">Gross Machine Revenue</p>
+                    <h3 class="text-3xl font-bold text-slate-900" id="venueTotalRev">$0.00</h3>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <p class="text-sm font-medium text-slate-500 mb-1">Your Commission Rate</p>
+                    <h3 class="text-3xl font-bold text-slate-700" id="venueCutPercent">0%</h3>
+                </div>
+                <div class="bg-blue-600 p-6 rounded-2xl shadow-sm border border-blue-700 text-white">
+                    <p class="text-sm font-medium text-blue-100 mb-1">Your Total Earnings</p>
+                    <h3 class="text-3xl font-bold text-white" id="venueTotalEarnings">$0.00</h3>
+                </div>
+            </div>
+
+            <!-- Venue Account Management -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="font-bold text-slate-800 mb-4">Account Details</h3>
+                <form id="venueUpdateForm" class="max-w-md space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Display Name</label>
+                        <input type="text" id="venueUpdateName" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+                    </div>
+                    <button type="submit" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium px-4 py-2 rounded-lg text-sm transition-colors border border-slate-300">
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+        </section>
+
     </main>
 
-    <!-- Toast Container -->
-    <div id="toast-container"></div>
-
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { 
-            getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, 
-            createUserWithEmailAndPassword, updateEmail, updatePassword 
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { 
-            getFirestore, collection, query, where, addDoc, onSnapshot, 
-            orderBy, serverTimestamp, doc, setDoc, deleteDoc, updateDoc
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        // Import Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, addDoc, onSnapshot, query, where, doc, setDoc, deleteDoc, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
-        // Provided Firebase Config
+        // Firebase Configuration (From User)
         const firebaseConfig = {
             apiKey: "AIzaSyBPb1erfnxSJc6l7wXdPv0LTrRWg3SsUrE",
             authDomain: "vending-machine3.firebaseapp.com",
@@ -423,402 +254,392 @@
             measurementId: "G-1TF2LLWSE8"
         };
 
-        // Initialize Primary Firebase App
-        const app_fb = initializeApp(firebaseConfig);
-        const auth = getAuth(app_fb);
-        const db = getFirestore(app_fb);
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Initialize a Secondary Firebase App strictly for Admin creating user accounts 
-        // without logging the Admin out of the main session.
-        const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
-        const secondaryAuth = getAuth(secondaryApp);
-
-        // Business Logic Constants
+        // Constants
         const ADMIN_EMAIL = 'vincent.rasskazov@gmail.com';
-        const SALE_PRICE = 2.00; // Customer pays $2
-        const CAPSULE_COST = 0.50; // Cost of goods sold (COGS)
 
-        window.app = {
-            currentUser: null,
-            adminChart: null,
-            unsubSales: null,
-            unsubVenues: null,
-            venueProfile: null,
-
-            // Utility: Toast Notifications
-            showToast: (msg, type='info') => {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-                let icon = type === 'success' ? 'check-circle' : (type === 'error' ? 'circle-exclamation' : 'info-circle');
-                toast.innerHTML = `<i class="fa-solid fa-${icon} mr-2"></i> ${msg}`;
-                container.appendChild(toast);
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translateY(20px)';
-                    setTimeout(() => toast.remove(), 300);
-                }, 4000);
-            },
-
-            // Routing
-            showView: (viewId) => {
-                ['landing', 'login', 'admin', 'venue'].forEach(v => {
-                    document.getElementById(`view-${v}`).classList.add('hidden-view');
-                });
-                document.getElementById(`view-${viewId}`).classList.remove('hidden-view');
-                window.scrollTo(0, 0);
-            },
-
-            routeDashboard: () => {
-                if(!app.currentUser) return;
-                if(app.currentUser.email === ADMIN_EMAIL) app.showView('admin');
-                else app.showView('venue');
-            },
-
-            handleLogin: async (e) => {
-                e.preventDefault();
-                const btn = document.getElementById('login-submit-btn');
-                const email = document.getElementById('login-email').value;
-                const pass = document.getElementById('login-password').value;
-
-                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
-                btn.disabled = true;
-
-                try {
-                    await signInWithEmailAndPassword(auth, email, pass);
-                    document.getElementById('login-form').reset();
-                    app.showToast('Login successful', 'success');
-                    // onAuthStateChanged handles routing
-                } catch (error) {
-                    console.error(error);
-                    app.showToast('Invalid credentials. Please try again.', 'error');
-                } finally {
-                    btn.innerHTML = `Secure Sign In <i class="fa-solid fa-arrow-right ml-2 mt-0.5 opacity-70"></i>`;
-                    btn.disabled = false;
-                }
-            },
-
-            logout: async () => {
-                await signOut(auth);
-                app.showToast('Logged out securely', 'info');
-            },
-
-            initAdminDashboard: () => {
-                app.showView('admin');
-                
-                // 1. Listen to all sales
-                const salesQ = query(collection(db, 'sales'), orderBy('timestamp', 'desc'));
-                app.unsubSales = onSnapshot(salesQ, (snapshot) => {
-                    let totalCount = snapshot.docs.length;
-                    let totalRevenue = totalCount * SALE_PRICE;
-                    let cogs = totalCount * CAPSULE_COST;
-                    
-                    document.getElementById('admin-total-sales').innerText = totalCount;
-                    document.getElementById('admin-gross-revenue').innerText = `$${totalRevenue.toFixed(2)}`;
-                    
-                    // Chart Logic
-                    const salesByDay = {};
-                    const last7Days = Array.from({length: 7}, (_, i) => {
-                        const d = new Date();
-                        d.setDate(d.getDate() - i);
-                        return d.toLocaleDateString('en-AU', {weekday: 'short', month:'short', day:'numeric'});
-                    }).reverse();
-
-                    last7Days.forEach(day => salesByDay[day] = 0);
-
-                    // We also need to aggregate total venue owed based on specific venue cuts.
-                    // For accuracy, we wait until venues are loaded. We'll do an estimate loop below.
-                    let totalOwed = 0;
-
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        if(data.timestamp) {
-                            const dateStr = data.timestamp.toDate().toLocaleDateString('en-AU', {weekday: 'short', month:'short', day:'numeric'});
-                            if(salesByDay[dateStr] !== undefined) salesByDay[dateStr]++;
-                        }
-                        // Estimate owed if cut is stored on sale, otherwise default to 20% for quick calc
-                        totalOwed += SALE_PRICE * ((data.venueCut || 20) / 100);
-                    });
-
-                    app.updateAdminChart(last7Days, Object.values(salesByDay));
-                    
-                    let netProfit = totalRevenue - totalOwed - cogs;
-                    document.getElementById('admin-venue-payouts').innerText = `$${totalOwed.toFixed(2)}`;
-                    document.getElementById('admin-net-profit').innerText = `$${netProfit.toFixed(2)}`;
-                });
-
-                // 2. Listen to active venues
-                const venuesQ = query(collection(db, 'venues'), where("deleted", "!=", true));
-                app.unsubVenues = onSnapshot(venuesQ, (snapshot) => {
-                    const listEl = document.getElementById('admin-venue-list');
-                    listEl.innerHTML = '';
-                    if(snapshot.empty) {
-                        listEl.innerHTML = '<div class="text-sm text-slate-400 text-center py-4">No active venues.</div>';
-                        return;
-                    }
-                    snapshot.forEach(doc => {
-                        const v = doc.data();
-                        listEl.innerHTML += `
-                            <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
-                                <div>
-                                    <div class="font-bold text-slate-800 text-sm">${v.name}</div>
-                                    <div class="text-xs text-slate-500">${v.email}</div>
-                                </div>
-                                <div class="flex items-center space-x-3">
-                                    <div class="text-xs font-bold text-brand-700 bg-brand-50 px-2 py-1 rounded border border-brand-100">
-                                        ${v.cut}% Cut
-                                    </div>
-                                    <button onclick="app.deleteVenue('${doc.id}')" class="text-slate-400 hover:text-red-500 transition-colors" title="Remove Venue">
-                                        <i class="fa-solid fa-trash-can"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                });
-            },
-
-            updateAdminChart: (labels, data) => {
-                const ctx = document.getElementById('adminSalesChart').getContext('2d');
-                if(app.adminChart) app.adminChart.destroy();
-                
-                app.adminChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Capsules Sold',
-                            data: data,
-                            borderColor: '#0d9488', // brand-600
-                            backgroundColor: 'rgba(13, 148, 136, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#0d9488',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, ticks: { stepSize: 1, color: '#94a3b8' }, grid: { color: '#f1f5f9' } },
-                            x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
-                        },
-                        interaction: { intersect: false, mode: 'index' }
-                    }
-                });
-            },
-
-            // Admin: Create a new venue via secondary Auth instance
-            handleCreateVenue: async (e) => {
-                e.preventDefault();
-                const btn = document.getElementById('cv-submit-btn');
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-                btn.disabled = true;
-
-                const name = document.getElementById('cv-name').value;
-                const email = document.getElementById('cv-email').value;
-                const password = document.getElementById('cv-password').value;
-                const cut = parseInt(document.getElementById('cv-cut').value);
-
-                try {
-                    // Create Auth User via secondary app so Admin stays logged in
-                    const userCredential = await createUserWithEmailAndPassword(secondaryAuth, email, password);
-                    const newVenueUid = userCredential.user.uid;
-                    await signOut(secondaryAuth); // Sign out of secondary immediately
-
-                    // Create Firestore Document linking to that UID
-                    await setDoc(doc(db, 'venues', newVenueUid), {
-                        name: name,
-                        email: email,
-                        cut: cut,
-                        createdAt: serverTimestamp(),
-                        deleted: false
-                    });
-
-                    app.showToast('Venue profile created successfully!', 'success');
-                    document.getElementById('admin-create-venue-form').reset();
-                } catch(err) {
-                    console.error(err);
-                    app.showToast(err.message, 'error');
-                } finally {
-                    btn.innerHTML = 'Create Partner Account';
-                    btn.disabled = false;
-                }
-            },
-
-            // Admin: Soft delete venue (hides them from list, stops payouts)
-            deleteVenue: async (venueId) => {
-                if(!confirm("Are you sure you want to remove this venue?")) return;
-                try {
-                    // Update document to deleted instead of actually deleting, to preserve historical sales data
-                    await updateDoc(doc(db, 'venues', venueId), { deleted: true });
-                    app.showToast('Venue removed from active list.', 'success');
-                } catch(e) {
-                    app.showToast('Error removing venue.', 'error');
-                }
-            },
-
-            initVenueDashboard: async (user) => {
-                app.showView('venue');
-                
-                // Fetch specific venue profile
-                try {
-                    const venueDoc = await getDoc(doc(db, 'venues', user.uid));
-                    if(venueDoc.exists()) {
-                        app.venueProfile = venueDoc.data();
-                        document.getElementById('venue-welcome-text').innerText = `${app.venueProfile.name}`;
-                        document.getElementById('venue-cut-percent').innerText = app.venueProfile.cut;
-                        document.getElementById('vs-email').value = app.venueProfile.email;
-                    }
-                } catch(e) {
-                    console.warn("Venue profile not found, defaulting.");
-                    app.venueProfile = { cut: 20 };
-                    document.getElementById('vs-email').value = user.email;
-                }
-
-                // Listen to sales matching their UID
-                const salesQ = query(collection(db, 'sales'), where("venueId", "==", user.uid), orderBy('timestamp', 'desc'));
-                app.unsubSales = onSnapshot(salesQ, (snapshot) => {
-                    let count = snapshot.docs.length;
-                    let rev = count * SALE_PRICE;
-                    let cutAmount = rev * (app.venueProfile.cut / 100);
-                    
-                    document.getElementById('venue-total-sales').innerText = count;
-                    document.getElementById('venue-gross-revenue').innerText = `$${rev.toFixed(2)}`;
-                    document.getElementById('venue-net-cut').innerText = `$${cutAmount.toFixed(2)}`;
-
-                    const tbody = document.getElementById('venue-activity-log');
-                    const emptyState = document.getElementById('venue-empty-state');
-                    
-                    tbody.innerHTML = '';
-                    if(count === 0) {
-                        emptyState.classList.remove('hidden');
-                        emptyState.classList.add('flex');
-                    } else {
-                        emptyState.classList.add('hidden');
-                        emptyState.classList.remove('flex');
-                        let displayed = 0;
-                        snapshot.forEach(doc => {
-                            if(displayed >= 10) return; // Show last 10
-                            const data = doc.data();
-                            const timeStr = data.timestamp ? data.timestamp.toDate().toLocaleString('en-AU', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : 'Just now';
-                            tbody.innerHTML += `
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-600">${timeStr}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-800"><i class="fa-solid fa-rotate mr-2 text-brand-500"></i>Capsule Dispensed</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-emerald-600 font-bold">+$${SALE_PRICE.toFixed(2)}</td>
-                                </tr>
-                            `;
-                            displayed++;
-                        });
-                    }
-                });
-            },
-
-            // Venue: Update Email
-            handleUpdateVenueEmail: async (e) => {
-                e.preventDefault();
-                const newEmail = document.getElementById('vs-email').value;
-                const btn = e.target.querySelector('button');
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-                
-                try {
-                    // Update Firebase Auth
-                    await updateEmail(app.currentUser, newEmail);
-                    // Update Firestore Profile
-                    await updateDoc(doc(db, 'venues', app.currentUser.uid), { email: newEmail });
-                    app.showToast('Email updated successfully.', 'success');
-                } catch (error) {
-                    app.showToast(error.message, 'error');
-                } finally {
-                    btn.innerHTML = 'Update';
-                }
-            },
-
-            // Venue: Update Password
-            handleUpdateVenuePassword: async (e) => {
-                e.preventDefault();
-                const newPass = document.getElementById('vs-password').value;
-                const btn = e.target.querySelector('button');
-                const origText = btn.innerHTML;
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-
-                try {
-                    await updatePassword(app.currentUser, newPass);
-                    app.showToast('Password changed successfully.', 'success');
-                    e.target.reset();
-                } catch (error) {
-                    app.showToast(error.message, 'error');
-                } finally {
-                    btn.innerHTML = origText;
-                }
-            },
-
-            simulateSaleAdmin: async () => {
-                // To simulate as admin, we just assign it to a dummy venue ID
-                app.simulateSale("ADMIN_TEST_VENUE", 20);
-            },
-            simulateSaleVenue: async () => {
-                app.simulateSale(app.currentUser.uid, app.venueProfile.cut);
-            },
-            simulateSale: async (vId, vCut) => {
-                try {
-                    await addDoc(collection(db, 'sales'), {
-                        venueId: vId,
-                        venueCut: vCut,
-                        timestamp: serverTimestamp(),
-                        amount: SALE_PRICE,
-                        machineId: "SIM-ESP32"
-                    });
-                    app.showToast('IoT Pulse Received: Sale recorded!', 'success');
-                } catch (e) {
-                    console.error(e);
-                    app.showToast('Simulation failed.', 'error');
-                }
-            }
+        // DOM Elements
+        const views = {
+            public: document.getElementById('view-public'),
+            login: document.getElementById('view-login'),
+            admin: document.getElementById('view-admin'),
+            venue: document.getElementById('view-venue')
         };
+        
+        const navLoginBtn = document.getElementById('navLoginBtn');
+        const ctaLoginBtn = document.getElementById('ctaLoginBtn');
+        const navUserMenu = document.getElementById('navUserMenu');
+        const navUserEmail = document.getElementById('navUserEmail');
+        const navLogoutBtn = document.getElementById('navLogoutBtn');
+        const closeLoginBtn = document.getElementById('closeLoginBtn');
+        
+        // Login Form
+        const loginForm = document.getElementById('loginForm');
+        const loginEmail = document.getElementById('loginEmail');
+        const loginPassword = document.getElementById('loginPassword');
+        const loginError = document.getElementById('loginError');
+        const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+
+        // State
+        let currentUser = null;
+        let adminChartInstance = null;
+        let unsubSales = null;
+        let unsubVenues = null;
+
+        // --- Utility Functions ---
+
+        function showToast(message, isError = false) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-enter px-4 py-3 rounded-lg shadow-lg text-sm font-medium text-white pointer-events-auto flex items-center gap-2 ${isError ? 'bg-red-600' : 'bg-slate-800'}`;
+            toast.innerHTML = `
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    ${isError 
+                        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
+                        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>'}
+                </svg>
+                ${message}
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease-in-out';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function switchView(viewName) {
+            Object.values(views).forEach(el => el.classList.add('hidden-view'));
+            views[viewName].classList.remove('hidden-view');
+            
+            if(viewName === 'public' || viewName === 'login') {
+                navLoginBtn.classList.remove('hidden-view');
+                navUserMenu.classList.add('hidden-view');
+            } else {
+                navLoginBtn.classList.add('hidden-view');
+                navUserMenu.classList.remove('hidden-view');
+                navUserEmail.textContent = currentUser?.email || '';
+            }
+        }
+
+        // --- Auth Listeners & Routing ---
 
         onAuthStateChanged(auth, (user) => {
-            const navLoginBtn = document.getElementById('nav-login-btn');
-            const navLogoutBtn = document.getElementById('nav-logout-btn');
-            const navUserInfo = document.getElementById('nav-user-info');
-            const navDashboardBtn = document.getElementById('nav-dashboard-btn');
-            
-            // Cleanup listeners on state change
-            if(app.unsubSales) app.unsubSales();
-            if(app.unsubVenues) app.unsubVenues();
-            app.unsubSales = null;
-            app.unsubVenues = null;
+            currentUser = user;
+            // Clean up previous listeners
+            if(unsubSales) unsubSales();
+            if(unsubVenues) unsubVenues();
 
             if (user) {
-                app.currentUser = user;
-                navLoginBtn.classList.add('hidden');
-                navLogoutBtn.classList.remove('hidden');
-                navDashboardBtn.classList.remove('hidden');
-                
-                // Set badge based on role
-                navUserInfo.classList.remove('hidden');
+                views.login.classList.add('hidden-view');
                 if (user.email === ADMIN_EMAIL) {
-                    navUserInfo.innerHTML = '<i class="fa-solid fa-shield-halved mr-1 text-brand-600"></i> Admin';
-                    app.initAdminDashboard();
+                    switchView('admin');
+                    initAdminDashboard();
                 } else {
-                    navUserInfo.innerHTML = '<i class="fa-solid fa-store mr-1 text-brand-600"></i> Partner';
-                    app.initVenueDashboard(user);
+                    switchView('venue');
+                    initVenueDashboard();
                 }
             } else {
-                app.currentUser = null;
-                navLoginBtn.classList.remove('hidden');
-                navLogoutBtn.classList.add('hidden');
-                navDashboardBtn.classList.add('hidden');
-                navUserInfo.classList.add('hidden');
-                app.showView('landing');
+                switchView('public');
             }
         });
+
+        // --- Event Listeners ---
+
+        const openLogin = () => views.login.classList.remove('hidden-view');
+        navLoginBtn.addEventListener('click', openLogin);
+        ctaLoginBtn.addEventListener('click', openLogin);
+        
+        closeLoginBtn.addEventListener('click', () => {
+            views.login.classList.add('hidden-view');
+            loginError.classList.add('hidden-view');
+        });
+
+        navLogoutBtn.addEventListener('click', () => {
+            signOut(auth).then(() => showToast('Signed out successfully'));
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.classList.add('hidden-view');
+            const originalBtnText = loginSubmitBtn.innerHTML;
+            loginSubmitBtn.innerHTML = '<span class="animate-pulse">Authenticating...</span>';
+            loginSubmitBtn.disabled = true;
+
+            try {
+                await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
+                loginForm.reset();
+                showToast('Welcome back');
+            } catch (error) {
+                loginError.textContent = 'Invalid email or password. Please try again.';
+                loginError.classList.remove('hidden-view');
+            } finally {
+                loginSubmitBtn.innerHTML = originalBtnText;
+                loginSubmitBtn.disabled = false;
+            }
+        });
+
+        // --- ADMIN DASHBOARD LOGIC ---
+
+        function initAdminDashboard() {
+            const salesRef = collection(db, 'sales');
+            const venuesRef = collection(db, 'venues');
+            
+            let allVenues = {}; // Map of email -> venue data
+            let allSales = [];
+
+            // 1. Listen to Venues
+            unsubVenues = onSnapshot(venuesRef, (snapshot) => {
+                allVenues = {};
+                const tbody = document.getElementById('adminVenuesTableBody');
+                tbody.innerHTML = '';
+                
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const id = docSnap.id;
+                    allVenues[data.email] = { ...data, id };
+
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-slate-100 last:border-0";
+                    tr.innerHTML = `
+                        <td class="py-3 font-medium">${data.name || 'Unnamed Venue'}</td>
+                        <td class="py-3">${data.email}</td>
+                        <td class="py-3">${data.cutPercentage}%</td>
+                        <td class="py-3 text-right">
+                            <button data-id="${id}" class="delete-venue-btn text-red-500 hover:text-red-700 text-xs font-medium">Remove Profile</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // Attach delete listeners
+                document.querySelectorAll('.delete-venue-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const vid = e.target.getAttribute('data-id');
+                        if(confirm('Delete this venue profile data?')) {
+                            await deleteDoc(doc(db, 'venues', vid));
+                            showToast('Venue profile removed.');
+                        }
+                    });
+                });
+
+                updateAdminStats(allSales, allVenues);
+            }, (err) => console.error("Venue sync error", err));
+
+            // 2. Listen to Sales
+            unsubSales = onSnapshot(salesRef, (snapshot) => {
+                allSales = [];
+                snapshot.forEach(doc => allSales.push({id: doc.id, ...doc.data()}));
+                updateAdminStats(allSales, allVenues);
+                renderAdminChart(allSales);
+            }, (err) => console.error("Sales sync error", err));
+        }
+
+        function updateAdminStats(sales, venuesMap) {
+            let totalRev = 0;
+            let totalPayouts = 0;
+
+            sales.forEach(sale => {
+                const amt = Number(sale.amount) || 0;
+                totalRev += amt;
+                
+                // Calculate payout based on venue cut
+                const venueInfo = venuesMap[sale.venueEmail];
+                if (venueInfo && venueInfo.cutPercentage) {
+                    totalPayouts += amt * (Number(venueInfo.cutPercentage) / 100);
+                }
+            });
+
+            // Assuming 30% Cost of Goods (Capsules/Toys)
+            const cogs = totalRev * 0.30;
+            const netProfit = totalRev - cogs - totalPayouts;
+
+            document.getElementById('adminTotalRev').textContent = `$${totalRev.toFixed(2)}`;
+            document.getElementById('adminTotalPayouts').textContent = `$${totalPayouts.toFixed(2)}`;
+            document.getElementById('adminNetProfit').textContent = `$${netProfit.toFixed(2)}`;
+        }
+
+        function renderAdminChart(sales) {
+            const ctx = document.getElementById('adminSalesChart').getContext('2d');
+            
+            // Group sales by day (last 7 days for simplicity)
+            const dailyData = {};
+            // Init last 7 days
+            for(let i=6; i>=0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                dailyData[d.toLocaleDateString()] = 0;
+            }
+
+            sales.forEach(sale => {
+                if(!sale.timestamp) return;
+                const dateObj = sale.timestamp.toDate ? sale.timestamp.toDate() : new Date(sale.timestamp);
+                const dateStr = dateObj.toLocaleDateString();
+                if(dailyData[dateStr] !== undefined) {
+                    dailyData[dateStr] += Number(sale.amount);
+                }
+            });
+
+            const labels = Object.keys(dailyData);
+            const data = Object.values(dailyData);
+
+            if(adminChartInstance) adminChartInstance.destroy();
+
+            adminChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Daily Revenue ($)',
+                        data: data,
+                        borderColor: '#2563eb', // blue-600
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Admin: Add Venue Form
+        document.getElementById('addVenueForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('newVenueName').value;
+            const email = document.getElementById('newVenueEmail').value.toLowerCase();
+            const cut = document.getElementById('newVenueCut').value;
+            
+            try {
+                // Use email as Document ID to prevent duplicates and link easily
+                await setDoc(doc(db, 'venues', email), {
+                    name: name,
+                    email: email,
+                    cutPercentage: Number(cut)
+                });
+                document.getElementById('addVenueForm').reset();
+                showToast('Venue profile created successfully.');
+            } catch (err) {
+                console.error(err);
+                showToast('Error creating venue', true);
+            }
+        });
+
+        // Admin: Test Sale Button
+        document.getElementById('adminTestSaleBtn').addEventListener('click', async () => {
+            // Assign sale to a random venue for testing, or generic if none exist
+            const venuesSnap = await getDocs(collection(db, 'venues'));
+            let vEmail = 'unknown@venue.com';
+            if(!venuesSnap.empty) {
+                const vList = [];
+                venuesSnap.forEach(d => vList.push(d.data().email));
+                vEmail = vList[Math.floor(Math.random() * vList.length)];
+            }
+
+            try {
+                await addDoc(collection(db, 'sales'), {
+                    amount: 2.00,
+                    timestamp: serverTimestamp(),
+                    venueEmail: vEmail,
+                    notes: 'Simulated via dashboard'
+                });
+                showToast('Test sale added.');
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to add sale', true);
+            }
+        });
+
+        // --- VENUE DASHBOARD LOGIC ---
+
+        function initVenueDashboard() {
+            if(!currentUser) return;
+            const myEmail = currentUser.email.toLowerCase();
+            
+            document.getElementById('venueWelcome').textContent = currentUser.displayName 
+                ? `Welcome, ${currentUser.displayName}` 
+                : `Welcome, Partner`;
+            
+            // Set update form initial value
+            document.getElementById('venueUpdateName').value = currentUser.displayName || '';
+
+            // 1. Get Venue Profile data (for cut percentage)
+            const venueDocRef = doc(db, 'venues', myEmail);
+            let myCut = 0;
+
+            unsubVenues = onSnapshot(venueDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    myCut = Number(docSnap.data().cutPercentage) || 0;
+                    document.getElementById('venueCutPercent').textContent = `${myCut}%`;
+                    calculateVenueEarnings(); // Recalculate if cut changes
+                } else {
+                    document.getElementById('venueCutPercent').textContent = `0% (Profile pending)`;
+                }
+            }, (err) => console.error("Venue profile sync error", err));
+
+            // 2. Get Sales for this venue
+            let mySalesTotal = 0;
+            // Note: Since Firestore requires indexes for complex queries, we fetch all 
+            // and filter in memory to guarantee it works without requiring you to build indexes in console.
+            const salesRef = collection(db, 'sales');
+            
+            unsubSales = onSnapshot(salesRef, (snapshot) => {
+                mySalesTotal = 0;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if(data.venueEmail && data.venueEmail.toLowerCase() === myEmail) {
+                        mySalesTotal += Number(data.amount) || 0;
+                    }
+                });
+                calculateVenueEarnings();
+            }, (err) => console.error("Venue sales sync error", err));
+
+            function calculateVenueEarnings() {
+                document.getElementById('venueTotalRev').textContent = `$${mySalesTotal.toFixed(2)}`;
+                const earnings = mySalesTotal * (myCut / 100);
+                document.getElementById('venueTotalEarnings').textContent = `$${earnings.toFixed(2)}`;
+            }
+        }
+
+        // Venue Update Profile Form
+        document.getElementById('venueUpdateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newName = document.getElementById('venueUpdateName').value;
+            const btn = e.target.querySelector('button');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                await updateProfile(auth.currentUser, { displayName: newName });
+                
+                // Also try to update the venues collection if it exists
+                const venueRef = doc(db, 'venues', currentUser.email.toLowerCase());
+                await setDoc(venueRef, { name: newName }, { merge: true });
+
+                document.getElementById('venueWelcome').textContent = `Welcome, ${newName}`;
+                showToast('Account details updated');
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to update details', true);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save Changes';
+            }
+        });
+
     </script>
 </body>
 </html>
